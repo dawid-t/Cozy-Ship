@@ -1,4 +1,6 @@
 using Critsoft.CozyShip.MainMenu.Controllers;
+using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,6 +19,7 @@ namespace Critsoft.CozyShip.MainMenu.Views
         [SerializeField] private Button _settingsButton;
         [SerializeField] private Button _exitButton;
         [SerializeField] private Button _settingsBackButton;
+        [SerializeField] private TMP_Text _scoreboardText;
 
         #endregion
 
@@ -34,7 +37,8 @@ namespace Critsoft.CozyShip.MainMenu.Views
             _controller = controller;
 
             _controller.SettingsOpened += OnSettingsOpened;
-            
+            _controller.ScoreboardUpdated += UpdateScoreboard;
+
             _startButton.onClick.AddListener(_controller.StartGame);
             _settingsButton.onClick.AddListener(_controller.ToggleSettings);
             _exitButton.onClick.AddListener(_controller.ExitGame);
@@ -60,6 +64,7 @@ namespace Critsoft.CozyShip.MainMenu.Views
             if (_controller != null)
             {
                 _controller.SettingsOpened -= OnSettingsOpened;
+                _controller.ScoreboardUpdated -= UpdateScoreboard;
             }
 
             _startButton.onClick.RemoveListener(_controller.StartGame);
@@ -67,7 +72,16 @@ namespace Critsoft.CozyShip.MainMenu.Views
             _exitButton.onClick.RemoveListener(_controller.ExitGame);
             _settingsBackButton.onClick.RemoveListener(_controller.ToggleSettings);
         }
-        
+
+        private void UpdateScoreboard(List<GameResult> results)
+        {
+            _scoreboardText.text = "";
+            for (int i = 0; i < results.Count; i++)
+            {
+                _scoreboardText.text += $"#{i + 1} - {results[i].AllCollisions} wrecks - {results[i].TotalElapsedTime:F1}s\n";
+            }
+        }
+
         private void OnSettingsOpened(bool isOpen)
         {
             ToggleSettings(isOpen);

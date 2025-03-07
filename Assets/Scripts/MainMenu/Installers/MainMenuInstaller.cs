@@ -9,9 +9,13 @@ namespace Critsoft.CozyShip.MainMenu.Installers
     {
         public override void InstallBindings()
         {
+            // Models, Views, Controllers
             Container.Bind<MainMenuModel>().AsSingle().NonLazy();
             Container.Bind<MainMenuView>().FromComponentInHierarchy().AsSingle();
             Container.Bind<MainMenuController>().FromComponentInHierarchy().AsSingle();
+
+            // Other
+            Container.Bind<GameResultsStorage>().AsSingle();
         }
     }
 }

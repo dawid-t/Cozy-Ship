@@ -11,6 +11,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
     {
         #region Events
 
+        public event Action AllLevelsCompleted;
         public event Action<int, PlayerStatsEventArgs> LevelCompleted;
         public event Action<LevelInitiatedEventArgs> LevelInitiated;
 
@@ -54,7 +55,11 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
 
         public void LoadNextLevel()
         {
-            _model.LoadNextLevel();
+            bool wasNextLevelLoaded = _model.LoadNextLevel();
+            if (!wasNextLevelLoaded)
+            {
+                AllLevelsCompleted?.Invoke();
+            }
         }
         
         public int GetPointsLimit()

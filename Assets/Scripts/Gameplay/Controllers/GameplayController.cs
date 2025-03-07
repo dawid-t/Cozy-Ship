@@ -19,6 +19,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         public event Action<float> TimeUpdated;
         public event Action<bool> PauseStateChanged;
         public event Action<LevelInitiatedEventArgs> LevelInitiated;
+        public event Action<GameResult> GameCompleted;
 
         #endregion
 
@@ -33,6 +34,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         private GameplayModel _model;
         private GameplayView _view;
         private LevelController _levelController;
+        private GameResultsStorage _resultsStorage;
         private ShipCollisionHandler _shipCollisionHandler;
 
         #endregion
@@ -40,11 +42,13 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         #region Public Methods
 
         [Inject]
-        public void Construct(GameplayModel model, GameplayView view, LevelController levelController, ShipCollisionHandler shipCollisionHandler)
+        public void Construct(GameplayModel model, GameplayView view, LevelController levelController,
+            GameResultsStorage resultsStorage, ShipCollisionHandler shipCollisionHandler)
         {
             _model = model;
             _view = view;
             _levelController = levelController;
+            _resultsStorage = resultsStorage;
             _shipCollisionHandler = shipCollisionHandler;
 
             _model.PointsLimitReached += OnPointsLimitReached;
@@ -55,6 +59,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             _model.PauseStateChanged += OnPauseStateChanged;
 
             _levelController.LevelInitiated += OnLevelInitiated;
+            _levelController.AllLevelsCompleted += OnGameCompleted;
             _shipCollisionHandler.CollisionOccurred += RegisterCollision;
         }
 
@@ -150,6 +155,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             if (_levelController != null)
             {
                 _levelController.LevelInitiated -= OnLevelInitiated;
+                _levelController.AllLevelsCompleted -= OnGameCompleted;
             }
 
             if (_shipCollisionHandler != null)
@@ -211,6 +217,19 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         {
             _model.ResetGameplay();
             UpdatePointsLimit();
+        }
+
+        private void OnGameCompleted()
+        {
+            GameResult result = new GameResult
+            {
+                AllCollisions = _model.AllCollisions,
+                TotalElapsedTime = _model.TotalElapsedTime
+            };
+
+            _resultsStorage.AddResult(result.AllCollisions, result.TotalElapsedTime);
+            GameCompleted?.Invoke(result);
+            ExitToMenu();
         }
 
         #endregion

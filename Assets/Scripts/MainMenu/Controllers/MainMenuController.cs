@@ -4,6 +4,7 @@ using Critsoft.CozyShip.MainMenu.Models;
 using Critsoft.CozyShip.MainMenu.Views;
 using UnityEngine.SceneManagement;
 using System;
+using System.Collections.Generic;
 
 namespace Critsoft.CozyShip.MainMenu.Controllers
 {
@@ -12,6 +13,7 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
         #region Events
 
         public event Action<bool> SettingsOpened;
+        public event Action<List<GameResult>> ScoreboardUpdated;
 
         #endregion
 
@@ -19,16 +21,18 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
 
         private MainMenuModel _model;
         private MainMenuView _view;
+        private GameResultsStorage _resultsStorage;
 
         #endregion
 
         #region Public Methods
 
         [Inject]
-        public void Construct(MainMenuModel model, MainMenuView view)
+        public void Construct(MainMenuModel model, MainMenuView view, GameResultsStorage resultsStorage)
         {
             _model = model;
             _view = view;
+            _resultsStorage = resultsStorage;
 
             _model.SettingsOpened += OnSettingsOpened;
         }
@@ -52,12 +56,23 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
 
         #region Private Methods
 
+        private void Awake()
+        {
+            LoadScoreboard();
+        }
+
         private void OnDestroy()
         {
             if (_model != null)
             {
                 _model.SettingsOpened -= OnSettingsOpened;
             }
+        }
+
+        private void LoadScoreboard()
+        {
+            List<GameResult> results = _resultsStorage.LoadResults();
+            ScoreboardUpdated?.Invoke(results);
         }
 
         private void OnSettingsOpened(bool isOpen)

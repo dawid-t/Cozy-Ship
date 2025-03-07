@@ -24,6 +24,10 @@ namespace Critsoft.CozyShip.Gameplay.Models
         private float _elapsedTime = 0f;
         private bool _isPaused = false;
 
+        private int _allPoints = 0;
+        private int _allCollisions = 0;
+        private float _totalElapsedTime = 0f;
+
         #endregion
 
         #region Properties
@@ -37,6 +41,7 @@ namespace Critsoft.CozyShip.Gameplay.Models
                 PointsUpdated?.Invoke(_points);
                 if (_points >= _pointsLimit)
                 {
+                    UpdateTotalStats(_points, _collisions, _elapsedTime);
                     PointsLimitReached?.Invoke(GetPlayerStatsEventArgs());
                 }
             }
@@ -82,6 +87,10 @@ namespace Critsoft.CozyShip.Gameplay.Models
             }
         }
 
+        public int AllPoints => _allPoints;
+        public int AllCollisions => _allCollisions;
+        public float TotalElapsedTime => _totalElapsedTime;
+
         #endregion
 
         #region Public Methods
@@ -98,7 +107,7 @@ namespace Critsoft.CozyShip.Gameplay.Models
             TimeUpdated?.Invoke(_elapsedTime);
             PauseStateChanged?.Invoke(_isPaused);
         }
-
+        
         #endregion
 
         #region Private Methods
@@ -106,6 +115,13 @@ namespace Critsoft.CozyShip.Gameplay.Models
         private PlayerStatsEventArgs GetPlayerStatsEventArgs()
         {
             return new PlayerStatsEventArgs(PointsLimit, Collisions, ElapsedTime);
+        }
+
+        private void UpdateTotalStats(int additionalPoints, int additionalCollisions, float additionalElapsedTime)
+        {
+            _allPoints += additionalPoints;
+            _allCollisions += additionalCollisions;
+            _totalElapsedTime += additionalElapsedTime;
         }
 
         #endregion
