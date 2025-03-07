@@ -60,6 +60,7 @@ namespace Critsoft.CozyShip.Gameplay.Installers
             // Other
             Container.Bind<ShipCollisionHandler>().FromComponentInHierarchy().AsSingle();
             Container.Bind<GameResultsStorage>().AsSingle();
+            Container.Bind<SFXAudioManager>().FromComponentInHierarchy().AsSingle();
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Critsoft.CozyShip.Gameplay
         private const int MinCoinValue = 1;
         
         private Action<int> _coinCollected;
+        private SFXAudioManager _sfxAudioManager;
 
         #endregion
 
@@ -35,9 +36,10 @@ namespace Critsoft.CozyShip.Gameplay
         #region Public Methods
 
         [Inject]
-        public void Construct([Inject(Id = GameConfig.CoinCollectedId)] Action<int> coinCollected)
+        public void Construct([Inject(Id = GameConfig.CoinCollectedId)] Action<int> coinCollected, SFXAudioManager sfxAudioManager)
         {
             _coinCollected = coinCollected;
+            _sfxAudioManager = sfxAudioManager;
         }
 
         #endregion
@@ -56,6 +58,7 @@ namespace Critsoft.CozyShip.Gameplay
         {
             if (other.CompareTag(Tags.Player))
             {
+                _sfxAudioManager.PlaySound(SFXType.Coin);
                 _coinCollected?.Invoke(_coinValue);
                 gameObject.SetActive(false);
             }

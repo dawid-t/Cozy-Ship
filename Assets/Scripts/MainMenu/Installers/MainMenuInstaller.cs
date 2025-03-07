@@ -16,6 +16,7 @@ namespace Critsoft.CozyShip.MainMenu.Installers
 
             // Other
             Container.Bind<GameResultsStorage>().AsSingle();
+            Container.Bind<AmbientAudioManager>().FromComponentInHierarchy().AsSingle();
         }
     }
 }

@@ -47,14 +47,16 @@ namespace Critsoft.CozyShip.Gameplay.Player
         private WaitForSeconds _blinkWaitForSeconds;
         private GameplayController _gameplayController;
         private CollectibleCoinPool _coinPool;
+        private SFXAudioManager _sfxAudioManager;
 
         #endregion
 
         [Inject]
-        public void Construct(GameplayController gameplayController, CollectibleCoinPool coinPool)
+        public void Construct(GameplayController gameplayController, CollectibleCoinPool coinPool, SFXAudioManager sfxAudioManager)
         {
             _gameplayController = gameplayController;
             _coinPool = coinPool;
+            _sfxAudioManager = sfxAudioManager;
 
             _gameplayController.PointsUpdated += OnPointsUpdated;
         }
@@ -89,6 +91,7 @@ namespace Critsoft.CozyShip.Gameplay.Player
 
         private void DestroyShip()
         {
+            _sfxAudioManager.PlaySound(SFXType.Obstacle);
             _canUpdateCurrentCoinsNumber = false;
             _isRespawning = true;
             _collider.enabled = false;
