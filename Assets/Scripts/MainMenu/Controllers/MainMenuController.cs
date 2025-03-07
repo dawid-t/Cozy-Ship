@@ -5,6 +5,8 @@ using Critsoft.CozyShip.MainMenu.Views;
 using UnityEngine.SceneManagement;
 using System;
 using System.Collections.Generic;
+using Critsoft.CozyShip.Gameplay;
+using TMPro;
 
 namespace Critsoft.CozyShip.MainMenu.Controllers
 {
@@ -14,6 +16,7 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
 
         public event Action<bool> SettingsOpened;
         public event Action<List<GameResult>> ScoreboardUpdated;
+        public event Action<TMP_FontAsset> FontChanged;
 
         #endregion
 
@@ -35,6 +38,7 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
             _resultsStorage = resultsStorage;
 
             _model.SettingsOpened += OnSettingsOpened;
+            _model.FontChanged += OnFontChanged;
         }
 
         public void StartGame()
@@ -47,9 +51,33 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
             _model.ToggleSettings();
         }
 
+        public void ChangeMusicVolume(float volume)
+        {
+            AmbientAudioManager.Volume = volume;
+            PlayerPrefs.SetFloat(GameConfig.MusicVolumeKey, volume);
+            PlayerPrefs.Save();
+        }
+
+        public void ChangeSFXVolume(float volume)
+        {
+            SFXAudioManager.Volume = volume;
+            PlayerPrefs.SetFloat(GameConfig.SFXVolumeKey, volume);
+            PlayerPrefs.Save();
+        }
+
         public void ExitGame()
         {
             Application.Quit();
+        }
+
+        public void InitializeFonts(TMP_FontAsset[] fonts)
+        {
+            _model.InitializeFonts(fonts);
+        }
+
+        public void ChangeFont(int index)
+        {
+            _model.SetFont(index);
         }
 
         #endregion
@@ -66,6 +94,7 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
             if (_model != null)
             {
                 _model.SettingsOpened -= OnSettingsOpened;
+                _model.FontChanged -= OnFontChanged;
             }
         }
 
@@ -78,6 +107,11 @@ namespace Critsoft.CozyShip.MainMenu.Controllers
         private void OnSettingsOpened(bool isOpen)
         {
             SettingsOpened.Invoke(isOpen);
+        }
+
+        private void OnFontChanged(TMP_FontAsset font)
+        {
+            FontChanged?.Invoke(font);
         }
 
         #endregion

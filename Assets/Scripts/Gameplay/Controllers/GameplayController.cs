@@ -20,6 +20,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         public event Action<bool> PauseStateChanged;
         public event Action<LevelInitiatedEventArgs> LevelInitiated;
         public event Action<GameResult> GameCompleted;
+        public event Action<int> FontChanged;
 
         #endregion
 
@@ -114,6 +115,11 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             Application.Quit();
         }
 
+        public void ChangeFont(int fontIndex)
+        {
+            FontChanged?.Invoke(fontIndex);
+        }
+
         #endregion
 
         #region Private Methods
@@ -121,6 +127,9 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         private void Start()
         {
             InitHUDValues();
+
+            int savedFontIndex = PlayerPrefs.GetInt(GameConfig.SelectedFontIndexKey, 0);
+            ChangeFont(savedFontIndex);
         }
 
         private void OnEnable()

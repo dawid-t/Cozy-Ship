@@ -1278,6 +1278,8 @@ MonoBehaviour:
   _bronzePrefab: {fileID: 3894407940576856425, guid: 0d58ba97280ad4847b622c1ddf9c1b0a, type: 3}
   _silverPrefab: {fileID: 7032841351501988879, guid: 8c0db28c3b39c1c4294dc49176938130, type: 3}
   _goldPrefab: {fileID: 6762948779835986169, guid: 88953918601936e4989bfb615f8576ab, type: 3}
+  _standardFont: {fileID: 11400000, guid: 3015d2c5ebbad4fbc944c8238764609f, type: 2}
+  _alternativeFont: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
 --- !u!114 &332108631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5561,6 +5563,20 @@ MonoBehaviour:
   _restartButton: {fileID: 560829405}
   _exitToMenuButton: {fileID: 1953621981}
   _exitToDesktopButton: {fileID: 976236794}
+  _allTexts:
+  - {fileID: 392978018}
+  - {fileID: 1888708795}
+  - {fileID: 367373577}
+  - {fileID: 1413814557}
+  - {fileID: 567107625}
+  - {fileID: 2123996200}
+  - {fileID: 1403015273}
+  - {fileID: 442619809}
+  - {fileID: 322707579}
+  - {fileID: 519962652}
+  - {fileID: 1967546542}
+  - {fileID: 667093813}
+  - {fileID: 320499009}
 --- !u!114 &1746032205
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -25,11 +25,15 @@ namespace Critsoft.CozyShip.Gameplay.Views
         [SerializeField] private Button _exitToMenuButton;
         [SerializeField] private Button _exitToDesktopButton;
 
+        [Header("Fonts")]
+        [SerializeField] private TMP_Text[] _allTexts;
+
         #endregion
 
         #region Fields
 
         private GameplayController _controller;
+        private TMP_FontAsset[] _availableFonts;
         private string _lastUpdatedPoints;
         private string _lastUpdatedPointsLimit;
 
@@ -38,9 +42,10 @@ namespace Critsoft.CozyShip.Gameplay.Views
         #region Public Methods
 
         [Inject]
-        public void Construct(GameplayController controller)
+        public void Construct(GameplayController controller, [Inject(Id = GameConfig.AvailableFontsId)] TMP_FontAsset[] fonts)
         {
             _controller = controller;
+            _availableFonts = fonts;
 
             _controller.PointsLimitReached += OnPointsLimitReached;
             _controller.PointsUpdated += OnPointsUpdated;
@@ -49,6 +54,7 @@ namespace Critsoft.CozyShip.Gameplay.Views
             _controller.TimeUpdated += OnTimeUpdated;
             _controller.PauseStateChanged += OnPauseStateChanged;
             _controller.LevelInitiated += OnLevelInitiated;
+            _controller.FontChanged += OnFontChanged;
 
             _resumeButton.onClick.AddListener(_controller.TogglePause);
             _restartButton.onClick.AddListener(_controller.RestartLevel);
@@ -71,6 +77,7 @@ namespace Critsoft.CozyShip.Gameplay.Views
                 _controller.TimeUpdated -= OnTimeUpdated;
                 _controller.PauseStateChanged -= OnPauseStateChanged;
                 _controller.LevelInitiated -= OnLevelInitiated;
+                _controller.FontChanged -= OnFontChanged;
             }
 
             _resumeButton.onClick.RemoveListener(_controller.TogglePause);
@@ -141,6 +148,14 @@ namespace Critsoft.CozyShip.Gameplay.Views
             }
         }
 
+        private void OnFontChanged(int fontIndex)
+        {
+            foreach (var text in _allTexts)
+            {
+                text.font = _availableFonts[fontIndex];
+            }
+        }
+        
         #endregion
     }
 }

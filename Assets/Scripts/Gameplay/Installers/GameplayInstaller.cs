@@ -3,6 +3,7 @@ using Critsoft.CozyShip.Gameplay.Models;
 using Critsoft.CozyShip.Gameplay.Player;
 using Critsoft.CozyShip.Gameplay.Views;
 using System;
+using TMPro;
 using UnityEngine;
 using Zenject;
 
@@ -14,6 +15,9 @@ namespace Critsoft.CozyShip.Gameplay.Installers
         [SerializeField] private CollectibleCoin _bronzePrefab;
         [SerializeField] private CollectibleCoin _silverPrefab;
         [SerializeField] private CollectibleCoin _goldPrefab;
+        [Space]
+        [SerializeField] private TMP_FontAsset _standardFont;
+        [SerializeField] private TMP_FontAsset _alternativeFont;
 
         public override void InstallBindings()
         {
@@ -61,6 +65,9 @@ namespace Critsoft.CozyShip.Gameplay.Installers
             Container.Bind<ShipCollisionHandler>().FromComponentInHierarchy().AsSingle();
             Container.Bind<GameResultsStorage>().AsSingle();
             Container.Bind<SFXAudioManager>().FromComponentInHierarchy().AsSingle();
+
+            TMP_FontAsset[] availableFonts = new TMP_FontAsset[] { _standardFont, _alternativeFont };
+            Container.Bind<TMP_FontAsset[]>().WithId(GameConfig.AvailableFontsId).FromInstance(availableFonts).AsSingle();
         }
     }
 }
