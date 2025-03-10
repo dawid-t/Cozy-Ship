@@ -7,6 +7,7 @@ namespace Critsoft.CozyShip.Gameplay.Models
     {
         #region Events
 
+        public event Action AllLevelsCompleted;
         public event Action<int, PlayerStatsEventArgs> LevelCompleted;
         public event Action<LevelInitiatedEventArgs> LevelInitiated;
 
@@ -72,7 +73,11 @@ namespace Critsoft.CozyShip.Gameplay.Models
                 LevelInitiated?.Invoke(eventArgs);
                 return true;
             }
-            return false;
+            else
+            {
+                AllLevelsCompleted?.Invoke();
+                return false;
+            }
         }
 
         #endregion

@@ -39,6 +39,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
 
         public void Initialize()
         {
+            _model.AllLevelsCompleted += OnAllLevelsCompleted;
             _model.LevelCompleted += OnLevelCompleted;
             _model.LevelInitiated += OnLevelInitiated;
             _gameplayController.PointsLimitReached += OnPointsLimitReached;
@@ -48,6 +49,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
 
         public void Dispose()
         {
+            _model.AllLevelsCompleted -= OnAllLevelsCompleted;
             _model.LevelCompleted -= OnLevelCompleted;
             _model.LevelInitiated -= OnLevelInitiated;
             _gameplayController.PointsLimitReached -= OnPointsLimitReached;
@@ -55,11 +57,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
 
         public void LoadNextLevel()
         {
-            bool wasNextLevelLoaded = _model.LoadNextLevel();
-            if (!wasNextLevelLoaded)
-            {
-                AllLevelsCompleted?.Invoke();
-            }
+            _model.LoadNextLevel();
         }
         
         public int GetPointsLimit()
@@ -80,6 +78,11 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         {
             Time.timeScale = 0;
             LevelCompleted?.Invoke(levelId, eventArgs);
+        }
+
+        private void OnAllLevelsCompleted()
+        {
+            AllLevelsCompleted?.Invoke();
         }
 
         private void OnLevelInitiated(LevelInitiatedEventArgs eventArgs)
