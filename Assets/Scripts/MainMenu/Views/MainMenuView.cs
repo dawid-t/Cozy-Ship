@@ -1,5 +1,6 @@
 using Critsoft.CozyShip.MainMenu.Controllers;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -31,21 +32,21 @@ namespace Critsoft.CozyShip.MainMenu.Views
         #region Fields
 
         private MainMenuController _controller;
-        private TMP_FontAsset[] _availableFonts;
 
         #endregion
 
         #region Public Methods
 
         [Inject]
-        public void Construct(MainMenuController controller, [Inject(Id = GameConfig.AvailableFontsId)] TMP_FontAsset[] fonts)
+        public void Construct(MainMenuController controller)
         {
             _controller = controller;
-            _availableFonts = fonts;
 
-            _controller.SettingsOpened += OnSettingsOpened;
-            _controller.ScoreboardUpdated += UpdateScoreboard;
-            _controller.FontChanged += UpdateFont;
+            _controller.SettingsOpened += ToggleSettings;
+            _controller.ScoreboardUpdated += OnScoreboardUpdated;
+            _controller.MusicVolumeChanged += OnMusicVolumeChanged;
+            _controller.SFXVolumeChanged += OnSFXVolumeChanged;
+            _controller.FontChanged += OnFontChanged;
 
             _startButton.onClick.AddListener(_controller.StartGame);
             _settingsButton.onClick.AddListener(_controller.ToggleSettings);
@@ -55,26 +56,16 @@ namespace Critsoft.CozyShip.MainMenu.Views
             _musicVolumeSlider.onValueChanged.AddListener(_controller.ChangeMusicVolume);
             _sfxVolumeSlider.onValueChanged.AddListener(_controller.ChangeSFXVolume);
             _fontDropdown.onValueChanged.AddListener(_controller.ChangeFont);
-
-            _controller.InitializeFonts(_availableFonts);
         }
 
         public void ToggleSettings(bool isOpen)
         {
             _menuCanvas.enabled = !isOpen;
             _settingsCanvas.enabled = isOpen;
-            
+
             EventSystem.current.SetSelectedGameObject(null);
 
             (isOpen ? _settingsBackButton : _settingsButton).Select();
-        }
-
-        public void UpdateFont(TMP_FontAsset newFont)
-        {
-            foreach (var textElement in _allTexts)
-            {
-                textElement.font = newFont;
-            }
         }
 
         #endregion
@@ -83,12 +74,11 @@ namespace Critsoft.CozyShip.MainMenu.Views
 
         private void OnDestroy()
         {
-            if (_controller != null)
-            {
-                _controller.SettingsOpened -= OnSettingsOpened;
-                _controller.ScoreboardUpdated -= UpdateScoreboard;
-                _controller.FontChanged -= UpdateFont;
-            }
+            _controller.SettingsOpened -= ToggleSettings;
+            _controller.ScoreboardUpdated -= OnScoreboardUpdated;
+            _controller.MusicVolumeChanged -= OnMusicVolumeChanged;
+            _controller.SFXVolumeChanged -= OnSFXVolumeChanged;
+            _controller.FontChanged -= OnFontChanged;
 
             _startButton.onClick.RemoveListener(_controller.StartGame);
             _settingsButton.onClick.RemoveListener(_controller.ToggleSettings);
@@ -97,20 +87,31 @@ namespace Critsoft.CozyShip.MainMenu.Views
 
             _musicVolumeSlider.onValueChanged.RemoveListener(_controller.ChangeMusicVolume);
             _sfxVolumeSlider.onValueChanged.RemoveListener(_controller.ChangeSFXVolume);
+            _fontDropdown.onValueChanged.RemoveListener(_controller.ChangeFont);
         }
 
-        private void UpdateScoreboard(List<GameResult> results)
+        private void OnMusicVolumeChanged(float volume)
         {
-            _scoreboardText.text = "";
-            for (int i = 0; i < results.Count; i++)
+            _musicVolumeSlider.value = volume;
+        }
+
+        private void OnSFXVolumeChanged(float volume)
+        {
+            _sfxVolumeSlider.value = volume;
+        }
+
+        private void OnFontChanged(int fontIndex, TMP_FontAsset newFont)
+        {
+            foreach (var textElement in _allTexts)
             {
-                _scoreboardText.text += $"#{i + 1} - {results[i].AllCollisions} wrecks - {results[i].TotalElapsedTime:F1}s\n";
+                textElement.font = newFont;
             }
+            _fontDropdown.value = fontIndex;
         }
 
-        private void OnSettingsOpened(bool isOpen)
+        private void OnScoreboardUpdated(List<GameResult> results)
         {
-            ToggleSettings(isOpen);
+            _scoreboardText.text = string.Join("\n", results.Select((r, i) => $"#{i + 1} - {r.AllCollisions} wrecks - {r.TotalElapsedTime:F1}s"));
         }
 
         #endregion

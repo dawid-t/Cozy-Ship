@@ -1,36 +1,39 @@
+using Critsoft.CozyShip.MainMenu.Controllers;
 using UnityEngine;
+using Zenject;
 
 namespace Critsoft.CozyShip
 {
     [RequireComponent(typeof(AudioSource))]
     public class AmbientAudioManager : MonoBehaviour
     {
+        #region Serialized Fields
+
+        [SerializeField] private AudioSource _audioSource;
+
+        #endregion
+
         #region Fields
 
-        public static float _volume = 0.1f;
         private static AmbientAudioManager _instance;
-        private AudioSource _audioSource;
+        private MainMenuController _mainMenuController;
 
         #endregion
 
         #region Properties
 
-        public static float Volume
-        {
-            get => _volume;
-            set
-            {
-                _volume = value;
-                if (_instance != null)
-                {
-                    _instance._audioSource.volume = Volume;
-                }
-            }
-        }
+        public float Volume => _audioSource.volume;
 
         #endregion
 
         #region Public Methods
+
+        [Inject]
+        public void Construct(MainMenuController mainMenuController)
+        {
+            _mainMenuController = mainMenuController;
+            _mainMenuController.MusicVolumeChanged += OnVolumeChanged;
+        }
 
         public void PlayMusic(AudioClip clip)
         {
@@ -61,13 +64,19 @@ namespace Critsoft.CozyShip
                 Destroy(gameObject);
                 return;
             }
+        }
 
-            _audioSource = GetComponent<AudioSource>();
-            
-            float savedVolume = PlayerPrefs.GetFloat(GameConfig.MusicVolumeKey, Volume);
-            Volume = savedVolume;
+        private void OnDestroy()
+        {
+            if (_mainMenuController != null)
+            {
+                _mainMenuController.MusicVolumeChanged -= OnVolumeChanged;
+            }
+        }
 
-            _audioSource.volume = Volume;
+        private void OnVolumeChanged(float volume)
+        {
+            _audioSource.volume = volume;
         }
 
         #endregion

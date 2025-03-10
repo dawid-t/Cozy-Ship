@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a10ba813d8d4ba41b1efabd8d588502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _audioSource: {fileID: 6469211872933124060}
   _coinAudioClip: {fileID: 8300000, guid: 36db8dfb3569b48b5a823efb2f65395e, type: 3}
   _obstacleAudioClip: {fileID: 8300000, guid: b636400e20f9042428c8f46c3f077a12, type: 3}
 --- !u!82 &6469211872933124060

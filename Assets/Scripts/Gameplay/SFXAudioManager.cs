@@ -1,4 +1,6 @@
+using Critsoft.CozyShip.Gameplay.Controllers;
 using UnityEngine;
+using Zenject;
 
 namespace Critsoft.CozyShip.Gameplay
 {
@@ -13,6 +15,8 @@ namespace Critsoft.CozyShip.Gameplay
     {
         #region Serialized Fields
 
+        [SerializeField] private AudioSource _audioSource;
+        [Space]
         [SerializeField] private AudioClip _coinAudioClip;
         [SerializeField] private AudioClip _obstacleAudioClip;
 
@@ -20,34 +24,42 @@ namespace Critsoft.CozyShip.Gameplay
 
         #region Fields
 
-        private AudioSource _audioSource;
+        private GameplayController _gameplayController;
 
         #endregion
 
         #region Properties
 
-        public static float Volume { get; set; } = 0.3f;
+        public float Volume => _audioSource.volume;
 
         #endregion
 
         #region Public Methods
 
+        [Inject]
+        public void Construct(GameplayController gameplayController)
+        {
+            _gameplayController = gameplayController;
+            _gameplayController.SFXVolumeChanged += OnVolumeChanged;
+        }
+
         public void PlaySound(SFXType type)
         {
-            _audioSource.PlayOneShot(GetAudioClip(type), Volume);
+            _audioSource.PlayOneShot(GetAudioClip(type));
         }
 
         #endregion
 
         #region Private Methods
 
-        private void Awake()
+        private void OnDestroy()
         {
-            _audioSource = GetComponent<AudioSource>();
-            float savedVolume = PlayerPrefs.GetFloat(GameConfig.SFXVolumeKey, Volume);
-            Volume = savedVolume;
+            if (_gameplayController != null)
+            {
+                _gameplayController.SFXVolumeChanged -= OnVolumeChanged;
+            }
         }
-        
+
         private AudioClip GetAudioClip(SFXType type)
         {
             switch (type)
@@ -59,6 +71,11 @@ namespace Critsoft.CozyShip.Gameplay
                 default:
                     return _obstacleAudioClip;
             }
+        }
+
+        private void OnVolumeChanged(float volume)
+        {
+            _audioSource.volume = volume;
         }
 
         #endregion

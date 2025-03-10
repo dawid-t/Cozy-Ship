@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using TMPro;
 
 namespace Critsoft.CozyShip.Gameplay.Models
 {
@@ -13,6 +14,8 @@ namespace Critsoft.CozyShip.Gameplay.Models
         public event Action<int> CollisionsUpdated;
         public event Action<float> TimeUpdated;
         public event Action<bool> PauseStateChanged;
+        public event Action<float> SFXVolumeChanged;
+        public event Action<int, TMP_FontAsset> FontChanged;
 
         #endregion
 
@@ -27,6 +30,11 @@ namespace Critsoft.CozyShip.Gameplay.Models
         private int _allPoints = 0;
         private int _allCollisions = 0;
         private float _totalElapsedTime = 0f;
+
+        private TMP_FontAsset _currentFont;
+        private TMP_FontAsset[] _availableFonts;
+        private float _sfxVolume;
+        private int _fontIndex;
 
         #endregion
 
@@ -94,6 +102,31 @@ namespace Critsoft.CozyShip.Gameplay.Models
         #endregion
 
         #region Public Methods
+
+        public void InitializeSettings(float sfxVolume, int fontIndex, TMP_FontAsset[] fonts)
+        {
+            _availableFonts = fonts;
+            _sfxVolume = sfxVolume;
+            _fontIndex = fontIndex;
+
+            SetSFXVolume(_sfxVolume);
+            SetFont(_fontIndex);
+        }
+
+        public void SetSFXVolume(float volume)
+        {
+            _sfxVolume = volume;
+            SFXVolumeChanged?.Invoke(volume);
+        }
+
+        public void SetFont(int fontIndex)
+        {
+            if (_availableFonts != null && fontIndex >= 0 && fontIndex < _availableFonts.Length)
+            {
+                _currentFont = _availableFonts[fontIndex];
+                FontChanged?.Invoke(fontIndex, _currentFont);
+            }
+        }
 
         public void ResetGameplay()
         {

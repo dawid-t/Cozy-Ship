@@ -1,6 +1,5 @@
 using System;
 using TMPro;
-using UnityEngine;
 
 namespace Critsoft.CozyShip.MainMenu.Models
 {
@@ -9,7 +8,9 @@ namespace Critsoft.CozyShip.MainMenu.Models
         #region Events
 
         public event Action<bool> SettingsOpened;
-        public event Action<TMP_FontAsset> FontChanged;
+        public event Action<float> MusicVolumeChanged;
+        public event Action<float> SFXVolumeChanged;
+        public event Action<int, TMP_FontAsset> FontChanged;
 
         #endregion
 
@@ -18,6 +19,9 @@ namespace Critsoft.CozyShip.MainMenu.Models
         private bool _isSettingsOpen;
         private TMP_FontAsset _currentFont;
         private TMP_FontAsset[] _availableFonts;
+        private float _musicVolume;
+        private float _sfxVolume;
+        private int _fontIndex;
 
         #endregion
 
@@ -29,29 +33,37 @@ namespace Critsoft.CozyShip.MainMenu.Models
             SettingsOpened?.Invoke(_isSettingsOpen);
         }
 
-        public void InitializeFonts(TMP_FontAsset[] fonts)
+        public void InitializeSettings(float musicVolume, float sfxVolume, int fontIndex, TMP_FontAsset[] fonts)
         {
             _availableFonts = fonts;
-            int savedFontIndex = PlayerPrefs.GetInt(GameConfig.SelectedFontIndexKey, 0);
-            _currentFont = _availableFonts[savedFontIndex];
+            _musicVolume = musicVolume;
+            _sfxVolume = sfxVolume;
+            _fontIndex = fontIndex;
 
-            FontChanged?.Invoke(_currentFont);
+            SetMusicVolume(_musicVolume);
+            SetSFXVolume(_sfxVolume);
+            SetFont(_fontIndex);
         }
 
-        public void SetFont(int index)
+        public void SetMusicVolume(float volume)
         {
-            if (index >= 0 && index < _availableFonts.Length)
+            _musicVolume = volume;
+            MusicVolumeChanged?.Invoke(volume);
+        }
+
+        public void SetSFXVolume(float volume)
+        {
+            _sfxVolume = volume;
+            SFXVolumeChanged?.Invoke(volume);
+        }
+
+        public void SetFont(int fontIndex)
+        {
+            if (_availableFonts != null && fontIndex >= 0 && fontIndex < _availableFonts.Length)
             {
-                _currentFont = _availableFonts[index];
-                PlayerPrefs.SetInt(GameConfig.SelectedFontIndexKey, index);
-                PlayerPrefs.Save();
-                FontChanged?.Invoke(_currentFont);
+                _currentFont = _availableFonts[fontIndex];
+                FontChanged?.Invoke(fontIndex, _currentFont);
             }
-        }
-
-        public TMP_FontAsset GetCurrentFont()
-        {
-            return _currentFont;
         }
 
         #endregion

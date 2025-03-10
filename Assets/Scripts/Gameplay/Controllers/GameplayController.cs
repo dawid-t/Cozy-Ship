@@ -5,6 +5,7 @@ using Critsoft.CozyShip.Gameplay.Models;
 using Critsoft.CozyShip.Gameplay.Views;
 using UnityEngine.InputSystem;
 using Critsoft.CozyShip.Gameplay.Player;
+using TMPro;
 
 namespace Critsoft.CozyShip.Gameplay.Controllers
 {
@@ -20,7 +21,8 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         public event Action<bool> PauseStateChanged;
         public event Action<LevelInitiatedEventArgs> LevelInitiated;
         public event Action<GameResult> GameCompleted;
-        public event Action<int> FontChanged;
+        public event Action<float> SFXVolumeChanged;
+        public event Action<int, TMP_FontAsset> FontChanged;
 
         #endregion
 
@@ -37,6 +39,7 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         private LevelController _levelController;
         private GameResultsStorage _resultsStorage;
         private ShipCollisionHandler _shipCollisionHandler;
+        private TMP_FontAsset[] _availableFonts;
 
         #endregion
 
@@ -44,13 +47,15 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
 
         [Inject]
         public void Construct(GameplayModel model, GameplayView view, LevelController levelController,
-            GameResultsStorage resultsStorage, ShipCollisionHandler shipCollisionHandler)
+            GameResultsStorage resultsStorage, ShipCollisionHandler shipCollisionHandler,
+            [Inject(Id = GameConfig.AvailableFontsId)] TMP_FontAsset[] availableFonts)
         {
             _model = model;
             _view = view;
             _levelController = levelController;
             _resultsStorage = resultsStorage;
             _shipCollisionHandler = shipCollisionHandler;
+            _availableFonts = availableFonts;
 
             _model.PointsLimitReached += OnPointsLimitReached;
             _model.PointsUpdated += OnPointsUpdated;
@@ -58,6 +63,8 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             _model.CollisionsUpdated += OnCollisionsUpdated;
             _model.TimeUpdated += OnTimeUpdated;
             _model.PauseStateChanged += OnPauseStateChanged;
+            _model.SFXVolumeChanged += OnSFXVolumeChanged;
+            _model.FontChanged += OnFontChanged;
 
             _levelController.LevelInitiated += OnLevelInitiated;
             _levelController.AllLevelsCompleted += OnGameCompleted;
@@ -115,21 +122,14 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             Application.Quit();
         }
 
-        public void ChangeFont(int fontIndex)
-        {
-            FontChanged?.Invoke(fontIndex);
-        }
-
         #endregion
 
         #region Private Methods
 
         private void Start()
         {
+            LoadSettings();
             InitHUDValues();
-
-            int savedFontIndex = PlayerPrefs.GetInt(GameConfig.SelectedFontIndexKey, 0);
-            ChangeFont(savedFontIndex);
         }
 
         private void OnEnable()
@@ -159,6 +159,8 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
                 _model.CollisionsUpdated -= OnCollisionsUpdated;
                 _model.TimeUpdated -= OnTimeUpdated;
                 _model.PauseStateChanged -= OnPauseStateChanged;
+                _model.SFXVolumeChanged -= OnSFXVolumeChanged;
+                _model.FontChanged -= OnFontChanged;
             }
 
             if (_levelController != null)
@@ -171,6 +173,14 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
             {
                 _shipCollisionHandler.CollisionOccurred -= RegisterCollision;
             }
+        }
+
+        private void LoadSettings()
+        {
+            float sfxVolume = PlayerPrefs.GetFloat(GameConfig.SFXVolumeKey, GameConfig.DefaultSFXVolume);
+            int fontIndex = PlayerPrefs.GetInt(GameConfig.SelectedFontIndexKey, GameConfig.DefaultFontIndex);
+
+            _model.InitializeSettings(sfxVolume, fontIndex, _availableFonts);
         }
 
         private void InitHUDValues()
@@ -214,6 +224,16 @@ namespace Critsoft.CozyShip.Gameplay.Controllers
         private void OnPauseStateChanged(bool isPaused)
         {
             PauseStateChanged?.Invoke(isPaused);
+        }
+
+        private void OnSFXVolumeChanged(float volume)
+        {
+            SFXVolumeChanged?.Invoke(volume);
+        }
+
+        private void OnFontChanged(int fontIndex, TMP_FontAsset font)
+        {
+            FontChanged?.Invoke(fontIndex, font);
         }
 
         private void OnLevelInitiated(LevelInitiatedEventArgs eventArgs)

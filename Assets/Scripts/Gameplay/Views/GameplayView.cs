@@ -33,7 +33,6 @@ namespace Critsoft.CozyShip.Gameplay.Views
         #region Fields
 
         private GameplayController _controller;
-        private TMP_FontAsset[] _availableFonts;
         private string _lastUpdatedPoints;
         private string _lastUpdatedPointsLimit;
 
@@ -42,10 +41,9 @@ namespace Critsoft.CozyShip.Gameplay.Views
         #region Public Methods
 
         [Inject]
-        public void Construct(GameplayController controller, [Inject(Id = GameConfig.AvailableFontsId)] TMP_FontAsset[] fonts)
+        public void Construct(GameplayController controller)
         {
             _controller = controller;
-            _availableFonts = fonts;
 
             _controller.PointsLimitReached += OnPointsLimitReached;
             _controller.PointsUpdated += OnPointsUpdated;
@@ -148,14 +146,14 @@ namespace Critsoft.CozyShip.Gameplay.Views
             }
         }
 
-        private void OnFontChanged(int fontIndex)
+        private void OnFontChanged(int fontIndex, TMP_FontAsset newFont)
         {
-            foreach (var text in _allTexts)
+            foreach (var textElement in _allTexts)
             {
-                text.font = _availableFonts[fontIndex];
+                textElement.font = newFont;
             }
         }
-        
+
         #endregion
     }
 }
