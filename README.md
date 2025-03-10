@@ -2,7 +2,7 @@
 ### A small "cozy" game created in a few days as part of a recruitment process to showcase that my project and code are not a spaghetti.
 
 #### Description:
-- The project was created using the MVC design pattern (Model, View, Controller) along with Dependency Injection (Zenject).
+- The project was created using the MVC design pattern (Model-View-Controller) along with Dependency Injection (Zenject).
 - The new Input System was implemented and mapped to ensure the game works seamlessly with both keyboard and gamepad (UI navigation has also been handled).
 
 - The water shader was created based on this [ShaderGraph tutorial](https://youtu.be/78WCzTVmc28).  
