@@ -12,16 +12,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48399a5de0778374681247db46523418, type: 3}
   m_Name: Level-1
   m_EditorClassIdentifier: 
-  LevelId: 1
-  PointsLimit: 15
-  SceneScrollSpeed: 5
-  CoinMinSpawnTime: 2
-  CoinMaxSpawnTime: 6
-  CoinsToSpawn:
+  _levelId: 1
+  _pointsLimit: 15
+  _sceneScrollSpeed: 5
+  _coinMinSpawnTime: 2
+  _coinMaxSpawnTime: 6
+  _coinsToSpawn:
   - {fileID: 6138648888304404187, guid: 0d58ba97280ad4847b622c1ddf9c1b0a, type: 3}
   - {fileID: 6138648888304404187, guid: 8c0db28c3b39c1c4294dc49176938130, type: 3}
-  ObstacleMinSpawnTime: 3
-  ObstacleMaxSpawnTime: 20
-  ObstaclesToSpawn:
+  _obstacleMinSpawnTime: 3
+  _obstacleMaxSpawnTime: 20
+  _obstaclesToSpawn:
   - {fileID: 3815399530410694893, guid: cbd91e4c8d9787c4d94665f32387b69c, type: 3}
   - {fileID: 273841671711759986, guid: ed383919cc9ad4349a9eaafe48a0f932, type: 3}
